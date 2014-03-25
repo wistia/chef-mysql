@@ -40,6 +40,16 @@ if loaded_recipes.include?('mysql::percona_repo')
   end
 end
 
+if loaded_recipes.include?('mysql::mariadb_repo')
+  case node['platform_family']
+  when 'debian'
+    resources('apt_repository[mariadb]').run_action(:add)
+  when 'rhel'
+    resources('yum_key[RPM-GPG-KEY-mariadb]').run_action(:add)
+    resources('yum_repository[mariadb]').run_action(:add)
+  end
+end
+
 node['mysql']['client']['packages'].each do |name|
   resources("package[#{name}]").run_action(:install)
 end
